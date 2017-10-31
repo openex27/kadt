@@ -11,6 +11,10 @@ type avlNode struct {
 	Right   *avlNode
 }
 
+var (
+	minEle int
+)
+
 func MakeEmpty() *avlNode {
 	return nil
 }
@@ -140,85 +144,22 @@ func PrintTree(n *avlNode) {
 	}
 }
 
-//DeleteMin find mininum number in the tree, n can't be a nil.
-func (n *avlNode) DeleteMin() (*avlNode, int) {
+func (n *avlNode) DeleteMin() *avlNode {
 	if n.Left == nil {
-		if n.Right == nil {
-			return nil, n.Element
+		minEle = n.Element
+		return n.Right
+	}
+	n.Left = n.Left.DeleteMin()
+	if getHeight(n.Right)-getHeight(n.Left) == 2 {
+		if getHeight(n.Right.Right) >= getHeight(n.Right.Left) {
+			n = n.SingleRotateWithRight()
 		} else {
-			return n.Right, n.Element
+			n = n.DoubleRotateWithRight()
 		}
 	}
-	var backStack []*avlNode
-	fNode := n
-	cNode := n.Left
-	for {
-		if cNode.Left == nil {
-			if cNode.Right == nil {
-				fNode.Left = nil
-				//fNode.Height = getHeight(fNode.Right) + 1 // fNode.Left already nil
-				for item := len(backStack) - 1; item >= 0; item-- {
-					if getHeight(fNode.Right)-getHeight(fNode.Left) == 2 {
-						if getHeight(fNode.Right.Right) >= getHeight(fNode.Right.Left) {
-							backStack[item].Left = fNode.SingleRotateWithRight()
-						} else {
-							backStack[item].Left = fNode.DoubleRotateWithRight()
-						}
-					}
-					backStack[item].Height = hMax(getHeight(backStack[item].Left), getHeight(backStack[item].Right)) + 1
-					fNode = backStack[item]
-				}
-				if getHeight(n.Right)-getHeight(n.Left) == 2 {
-					if getHeight(n.Right.Right) >= getHeight(n.Right.Left) {
-						n = n.SingleRotateWithRight()
-					} else {
-						n = n.DoubleRotateWithRight()
-					}
-				}
-				n.Height = hMax(getHeight(n.Left), getHeight(n.Right)) + 1
-				return n, cNode.Element
-			} else {
-				fNode.Left = cNode.Right
-				//fNode.Height = hMax(getHeight(fNode.Left), getHeight(fNode.Right)) + 1
-				for item := len(backStack) - 1; item >= 0; item-- {
-					if getHeight(fNode.Right)-getHeight(fNode.Left) == 2 {
-						if getHeight(fNode.Right.Right) >= getHeight(fNode.Right.Left) {
-							backStack[item].Left = fNode.SingleRotateWithRight()
-						} else {
-							backStack[item].Left = fNode.DoubleRotateWithRight()
-						}
-					}
-					backStack[item].Height = hMax(getHeight(backStack[item].Left), getHeight(backStack[item].Right)) + 1
-					fNode = backStack[item]
-				}
-				if getHeight(n.Right)-getHeight(n.Left) == 2 {
-					if getHeight(n.Right.Right) >= getHeight(n.Right.Left) {
-						n = n.SingleRotateWithRight()
-					} else {
-						n = n.DoubleRotateWithRight()
-					}
-				}
-				n.Height = hMax(getHeight(n.Left), getHeight(n.Right)) + 1
-				return n, cNode.Element
-			}
-		} else {
-			backStack = append(backStack, fNode)
-			fNode = cNode
-			cNode = cNode.Left
-		}
-	}
-}
+	n.Height = hMax(getHeight(n.Left), getHeight(n.Right)) + 1
+	return n
 
-func (n *avlNode) FindMin() int {
-	if n.Left == nil {
-		return n.Element
-	}
-	m := n.Left.FindMin()
-	if m < n.Element {
-		return m
-	} else {
-		return n.Element
-	}
 }
 
 func (n *avlNode) Delete(element int) *avlNode {
@@ -229,18 +170,8 @@ func (n *avlNode) Delete(element int) *avlNode {
 	} else if element > n.Element {
 		n.Right = n.Right.Delete(element)
 	} else if n.Left != nil && n.Right != nil {
-		/*
-			n.Right, n.Element = n.Right.DeleteMin()
-			n.Height = hMax(getHeight(n.Left), getHeight(n.Right)) + 1
-			if n.Left.Height-getHeight(n.Right) == 2 {
-				if getHeight(n.Left.Left) >= getHeight(n.Left.Right) {
-					n = n.SingleRotateWithLeft()
-				} else {
-					n = n.DoubleRotateWithLeft()
-				}
-			}*/
-		n.Element = n.Right.FindMin()
-		n.Right = n.Right.Delete(n.Element)
+		n.Right = n.Right.DeleteMin()
+		n.Element = minEle
 		if n.Left.Height-getHeight(n.Right) == 2 {
 			if getHeight(n.Left.Left) >= getHeight(n.Left.Right) {
 				n = n.SingleRotateWithLeft()
