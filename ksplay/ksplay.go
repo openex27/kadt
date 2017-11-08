@@ -223,6 +223,67 @@ func (root *splayNode) Find(value int) (*splayNode, *splayNode) {
     }
 }
 
+func (root *splayNode) findMax() *splayNode {
+    Stack := recordStack{}
+    if root == nil {
+	return root
+    }
+    for {
+	if root.Right != nil {
+	    t := recordPoint{
+		SNode : root,
+		Direction:false,
+	    }
+	    Stack = append(Stack, t)
+	    root = root.Right
+	}else{
+	    return root.splay(Stack)
+	}
+    }
+}
+
+func (root *splayNode) Delete(value int) *splayNode {
+    Stack := recordStack{}
+    if root == nil {
+	return root
+    }
+    for {
+	if root.Element > value{
+	    if root.Left != nil {
+		t := recordPoint{
+		    SNode: root,
+		    Direction:true,
+		}
+		Stack = append(Stack, t)
+		root = root.Left
+	    }else{
+		return root.splay(Stack)
+	    }
+	}else if root.Element < value{
+	    if root.Right != nil {
+		t := recordPoint{
+		    SNode : root,
+		    Direction:false,
+		}
+		Stack = append(Stack,t)
+		root = root.Right
+	    }else{
+		return root.splay(Stack)
+	    }
+	}else{
+	    tempRoot := root.splay(Stack)
+	    leftTree := tempRoot.Left.findMax()
+	    rightTree := tempRoot.Right
+	    if leftTree == nil{
+		return rightTree
+	    }else{
+		leftTree.Right = rightTree
+		return leftTree
+	    }
+	}
+    }
+}
+
 func PrintTreePre(root *splayNode, ch chan string) {
     if root == nil {
 	if ch == nil {
