@@ -183,12 +183,45 @@ func (root *splayNode) Insert(value int) *splayNode {
 				root.Right = &tempNode
 				return root.Right.splay(Stack)
 			}
-		} else if root.Element == value {
+		} else { // root.Element == value
 			return root.splay(Stack)
 		}
 	}
 }
 
+func (root *splayNode) Find(value int) (*splayNode, *splayNode) {
+    Stack := recordStack{}
+    if root == nil {
+	return nil,root
+    }
+    for {
+	if root.Element > value{
+	    if root.Left != nil {
+	    t := recordPoint{
+		SNode: root,
+		Direction: true,
+	    }
+		Stack = append(Stack, t)
+		root = root.Left
+	    }else{
+		return nil,root.splay(Stack)
+	    }
+	}else if root.Element < value{
+	    if root.Right != nil {
+		t := recordPoint{
+		    SNode: root,
+		    Direction: false,
+		}
+		Stack = append(Stack,t)
+		root = root.Right
+	    }else{
+		return nil,root.splay(Stack)
+	    }
+	}else{ // root.Element == value
+	    return root,root.splay(Stack)
+	}
+    }
+}
 
 func PrintTreePre(root *splayNode, ch chan string) {
     if root == nil {
