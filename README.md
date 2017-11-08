@@ -5,7 +5,7 @@
 
 ----
 ## 二叉搜索树
-### **kavl -AVL树**
+### **kavl -- AVL树**
 
 节点结构
 
@@ -16,7 +16,6 @@ type avlNode struct {
         Left    *avlNode
         Right   *avlNode
 }
-
 ```
 
  - MakeEmpty
@@ -26,7 +25,7 @@ type avlNode struct {
  - PrintTree
  - IsBalanced
 
-### **ksplay splay树**
+### **ksplay -- splay树**
 
 节点结构
 
